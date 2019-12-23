@@ -6873,6 +6873,11 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
+simple-uploader.js@^0.5.4:
+  version "0.5.4"
+  resolved "https://registry.npm.taobao.org/simple-uploader.js/download/simple-uploader.js-0.5.4.tgz#f858ed1fefeddc58d46a724d5a6c77040b0b29bb"
+  integrity sha1-+FjtH+/t3FjUanJNWmx3BAsLKbs=
+
 slash@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npm.taobao.org/slash/download/slash-1.0.0.tgz#c41f2f6c39fc16d1cd17ad4b5d896114ae470d55"
@@ -7790,11 +7795,6 @@ vm-browserify@^1.0.1:
   resolved "https://registry.npm.taobao.org/vm-browserify/download/vm-browserify-1.1.2.tgz?cache=0&sync_timestamp=1572870772154&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fvm-browserify%2Fdownload%2Fvm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
   integrity sha1-eGQcSIuObKkadfUR56OzKobl3aA=
 
-vue-chartjs@^3.4.2:
-  version "3.5.0"
-  resolved "https://registry.npm.taobao.org/vue-chartjs/download/vue-chartjs-3.5.0.tgz#edd0c2be94c521bcbc5357c24afb9f3560855f84"
-  integrity sha1-7dDCvpTFIby8U1fCSvufNWCFX4Q=
-
 vue-eslint-parser@^5.0.0:
   version "5.0.0"
   resolved "https://registry.npm.taobao.org/vue-eslint-parser/download/vue-eslint-parser-5.0.0.tgz#00f4e4da94ec974b821a26ff0ed0f7a78402b8a1"
@@ -7822,6 +7822,13 @@ vue-loader@^15.7.2:
     loader-utils "^1.1.0"
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
+
+vue-simple-uploader@^0.7.4:
+  version "0.7.4"
+  resolved "https://registry.npm.taobao.org/vue-simple-uploader/download/vue-simple-uploader-0.7.4.tgz#8cf6033fdae05b39f898146cc961213a38606259"
+  integrity sha1-jPYDP9rgWzn4mBRsyWEhOjhgYlk=
+  dependencies:
+    simple-uploader.js "^0.5.4"
 
 vue-style-loader@^4.1.0:
   version "4.1.2"
