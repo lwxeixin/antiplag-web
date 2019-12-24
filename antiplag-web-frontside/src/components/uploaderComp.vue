@@ -2,9 +2,9 @@
     <uploader :options="options" :auto-start="true" @complete="$parent.updateFilesName" class="uploader p-3">
         <uploader-unsupport/>
         <uploader-drop>
-            <p>Drop files here to upload or </p>
-            <uploader-btn class="mr-1">select files</uploader-btn>
-            <uploader-btn :directory="true">select folder</uploader-btn>
+            <span class="mb-1">拖动文件至此处上传或 </span>
+            <uploader-btn class="mb-0 mr-1">选择文件</uploader-btn>
+            <uploader-btn class="mb-0" :directory="true">选择文件夹</uploader-btn>
         </uploader-drop>
         <uploader-list class="bg-light"/>
     </uploader>
@@ -32,8 +32,8 @@
     .uploader {
         font-size: small;
         .uploader-list {
-            height: 257px;
-            max-height: 257px;
+            height: 400px;
+            max-height: 400px;
             overflow: auto;
             overflow-x: hidden;
         }
