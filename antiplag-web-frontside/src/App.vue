@@ -6,9 +6,30 @@
                 <p>antiplag (web version)</p>
                 <hr>
             </div>
-            <div class="row px-3">
-                <uploader-comp class="col-6"/>
-                <div class="form p-3 col-6">
+            <div class="main-body row px-3">
+                <uploader-comp class="col-4"/>
+                <div class="list p-3 col-4">
+                    <ul class="nav bg-light">
+                        <li class="nav-item w-100">
+                            <div class="alert alert-light m-0 text-dark border-bottom d-flex justify-content-between rounded-0" role="alert">
+                                <span>管理已上传文件</span>
+                                <span>
+                                    <button @click="updateFilesName" type="button" class="btn btn-outline-primary btn-sm py-0">刷新</button>
+                                    <button v-if="uploadedFilesNameList !== null && uploadedFilesNameList.length" @click="deleteAllFiles" type="button" class="btn btn-outline-danger btn-sm py-0 ml-1">全部清除</button>
+                                </span>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="list-folder bg-light">
+                        <ul class="list-group list-group-flush">
+                            <li v-for="(item, index) in uploadedFilesNameList" :key="'item-in-listFolder'+index" class="list-group-item list-group-item-action d-flex justify-content-between">
+                                <span class="w-75 d-inline-block"><span class="font-weight-bold font-italic">{{index}}: </span>{{item}}</span>
+                                <button @click="deleteFile(item)" type="button" class="btn btn-outline-danger btn-sm py-0">✕</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="form p-3 col-4">
                     <small class="form-text text-muted">
                         请上传一个不加密的zip压缩文件，待比较的文件应在压缩文件的根目录位置。
                     </small>
@@ -84,17 +105,38 @@
         data() {
             return {
                 submitting: false,
-                simValue: 30
+                simValue: 30,
+                uploadedFilesNameList: null
             }
         },
         mounted() {
-
+            this.updateFilesName();
         },
         methods: {
             submit() {
-                this.axios.get(this.host + '/hello/getSessionId').then(res => {
+                let url = '/getFilesName';
+                this.axios.get(this.host + url).then(res => {
                     // eslint-disable-next-line no-console
                     console.info(res.data);
+                })
+            },
+            updateFilesName() {
+                this.axios.get(this.host + '/getFilesName').then(res => {
+                    this.uploadedFilesNameList = res.data;
+                })
+            },
+            deleteFile(fileName) {
+                this.axios.get(this.host + '/deleteFile', {
+                    params: {
+                        fileName: fileName
+                    }
+                }).then(res => {
+                    if (res.data) this.updateFilesName();
+                })
+            },
+            deleteAllFiles() {
+                this.axios.get(this.host + '/deleteAllFiles').then(() => {
+                    this.updateFilesName();
                 })
             }
         }
@@ -110,9 +152,29 @@
     }
     div#app {
         width: 90vw;
+        min-width: 980px;
         min-height: 300px;
         div.main {
             background-color: #c3e6cb;
+            div.main-body {
+                min-height: 390px;
+                div.list {
+                    div.list-folder {
+                        height: 300px;
+                        max-height: 300px;
+                        overflow-y: scroll;
+                        ul.list-group {
+                            li.list-group-item {
+                                span {
+                                    white-space: nowrap;
+                                    text-overflow: ellipsis;
+                                    overflow: hidden;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 </style>

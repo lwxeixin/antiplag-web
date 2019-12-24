@@ -1,12 +1,12 @@
 <template>
-    <uploader :options="options" class="uploader p-3">
+    <uploader :options="options" :auto-start="true" @complete="$parent.updateFilesName" class="uploader p-3">
         <uploader-unsupport/>
         <uploader-drop>
-            <span>Drop files here to upload or </span>
-            <uploader-btn :attrs="attrs" class="mr-1">select files</uploader-btn>
+            <p>Drop files here to upload or </p>
+            <uploader-btn class="mr-1">select files</uploader-btn>
             <uploader-btn :directory="true">select folder</uploader-btn>
         </uploader-drop>
-        <uploader-list/>
+        <uploader-list class="bg-light"/>
     </uploader>
 </template>
 
@@ -16,11 +16,12 @@
         data () {
             return {
                 options: {
-                    target: '//localhost:3000/upload',
-                    testChunks: false
-                },
-                attrs: {
-                    accept: 'application/zip'
+                    target: this.host + '/upload',
+                    withCredentials: true,
+                    testChunks: false,
+                    categaryMap: { //用于限制上传的类型
+                        image: ["gif", "jpg", "jpeg", "png", "bmp"]
+                    }
                 }
             }
         }
@@ -31,7 +32,8 @@
     .uploader {
         font-size: small;
         .uploader-list {
-            max-height: 440px;
+            height: 257px;
+            max-height: 257px;
             overflow: auto;
             overflow-x: hidden;
         }
