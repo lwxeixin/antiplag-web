@@ -8,7 +8,7 @@ This system is a web version based on [antiplag](https://github.com/fanghon/anti
 
 ## requirement
 
-- [jdk8 and above](https://www.oracle.com/technetwork/java/javase/downloads/index.html)
+- [jdk12 and above](https://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
 - Browser, such as [chrome](https://www.google.com/intl/zh-CN/chrome/)
 

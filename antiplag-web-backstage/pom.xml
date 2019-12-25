@@ -15,7 +15,7 @@
     <description>antiplag-web project for Spring Boot</description>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>12</java.version>
     </properties>
 
     <dependencies>
@@ -42,6 +42,14 @@
             <version>1.18.10</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>cn.mooyyu</groupId>
+            <artifactId>jplag</artifactId>
+            <version>2.12.1</version><!--对应jar相应版本（不知道可随意）-->
+            <scope>system</scope>
+            <systemPath>${pom.basedir}/lib/jplag-2.12.1-SNAPSHOT-jar-with-dependencies.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>
@@ -49,6 +57,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <includeSystemScope>true</includeSystemScope><!--添加此项-->
+                </configuration>
             </plugin>
         </plugins>
     </build>

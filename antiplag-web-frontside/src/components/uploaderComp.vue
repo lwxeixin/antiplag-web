@@ -1,10 +1,11 @@
 <template>
-    <uploader :options="options" :auto-start="true" @complete="$parent.updateFilesName" class="uploader p-3">
+    <uploader :key="status" :options="options" :auto-start="true" @complete="complete" @uploadStart="$parent.uploading = true" class="uploader p-3">
         <uploader-unsupport/>
         <uploader-drop>
-            <span class="mb-1">拖动文件至此处上传或 </span>
-            <uploader-btn class="mb-0 mr-1">选择文件</uploader-btn>
-            <uploader-btn class="mb-0" :directory="true">选择文件夹</uploader-btn>
+            <span class="mb-1">拖动文件至此或点击按钮上传 </span>
+            <uploader-btn class="mb-0 mr-1">文件</uploader-btn>
+            <uploader-btn class="mb-0 mr-1" :directory="true">文件夹</uploader-btn>
+            <button class="uploader-btn border-danger text-danger no-box-shadow" @click="status = !status">清除记录</button>
         </uploader-drop>
         <uploader-list class="bg-light"/>
     </uploader>
@@ -16,13 +17,20 @@
         data () {
             return {
                 options: {
-                    target: this.host + '/upload',
+                    target: this.host + '/fileManager/uploadFile',
                     withCredentials: true,
                     testChunks: false,
                     categaryMap: { //用于限制上传的类型
                         image: ["gif", "jpg", "jpeg", "png", "bmp"]
                     }
-                }
+                },
+                status: true
+            }
+        },
+        methods: {
+            complete() {
+                this.$parent.uploading = false;
+                this.$parent.updateFilesName();
             }
         }
     }
@@ -37,5 +45,8 @@
             overflow: auto;
             overflow-x: hidden;
         }
+    }
+    .no-box-shadow:focus {
+        box-shadow: none!important;
     }
 </style>

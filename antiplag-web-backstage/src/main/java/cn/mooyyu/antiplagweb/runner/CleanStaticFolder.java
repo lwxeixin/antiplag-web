@@ -11,14 +11,25 @@ import java.util.Objects;
 public class CleanStaticFolder implements ApplicationRunner {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public void run(ApplicationArguments args) throws Exception {
-        String folder = "static-file-folder/";
-        for (String dir : Objects.requireNonNull(new File(folder).list())) {
-            String url = folder + '/' + dir;
-            for (String file : Objects.requireNonNull(new File(folder, dir).list())) {
-                new File(url, file).delete();
+    public void run(ApplicationArguments args) {
+        final String folder = "static-file-folder/";
+        final File root = new File(folder);
+        if (!root.exists()) root.mkdir();
+        File resource = new File(root, "resource");
+        if (resource.exists()) deleteDir(resource);
+        else resource.mkdir();
+        File result = new File(root, "result");
+        if (result.exists()) deleteDir(result);
+        else result.mkdir();
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void deleteDir(File root) {
+        for (File dir : Objects.requireNonNull(root.listFiles())) {
+            for (File file : Objects.requireNonNull(dir.listFiles())) {
+                file.delete();
             }
-            new File(folder, dir).delete();
+            dir.delete();
         }
     }
 }

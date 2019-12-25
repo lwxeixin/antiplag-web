@@ -4,7 +4,8 @@ target/
 !**/src/main/**
 !**/src/test/**
 
-static-file-folder
+static-file-folder/resource/
+static-file-folder/result/
 
 ### STS ###
 .apt_generated

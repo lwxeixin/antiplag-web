@@ -14,8 +14,8 @@
                             <div class="alert alert-light m-0 text-dark border-bottom d-flex justify-content-between rounded-0" role="alert">
                                 <span>管理已上传文件</span>
                                 <span>
-                                    <button @click="updateFilesName" type="button" class="btn btn-outline-primary btn-sm py-0">刷新</button>
-                                    <button v-if="uploadedFilesNameList !== null && uploadedFilesNameList.length" @click="deleteAllFiles" type="button" class="btn btn-outline-danger btn-sm py-0 ml-1">全部清除</button>
+                                    <button @click="updateFilesName" type="button" class="btn btn-outline-primary btn-sm py-0 no-box-shadow">刷新</button>
+                                    <button v-if="uploadedFilesNameList !== null && uploadedFilesNameList.length" @click="deleteAllFiles" type="button" class="btn btn-outline-danger btn-sm py-0 ml-1 no-box-shadow">全部清除</button>
                                 </span>
                             </div>
                         </li>
@@ -24,7 +24,7 @@
                         <ul class="list-group list-group-flush">
                             <li v-for="(item, index) in uploadedFilesNameList" :key="'item-in-listFolder'+index" class="list-group-item list-group-item-action d-flex justify-content-between">
                                 <span class="w-75 d-inline-block"><span class="font-weight-bold font-italic">{{index}}: </span>{{item}}</span>
-                                <button @click="deleteFile(item)" type="button" class="btn btn-outline-danger btn-sm py-0">✕</button>
+                                <button @click="deleteFile(item)" type="button" class="btn btn-outline-danger btn-sm py-0 no-box-shadow">✕</button>
                             </li>
                         </ul>
                     </div>
@@ -36,54 +36,58 @@
                                 <div class="input-group-prepend">
                                     <label class="input-group-text" for="inputGroupSelect01">工具</label>
                                 </div>
-                                <select class="custom-select no-box-shadow" id="inputGroupSelect01">
-                                    <option value="1" selected>MOSS</option>
-                                    <option value="2">SIM</option>
-                                    <option value="3">jplag</option>
+                                <select v-model="compareTool" class="custom-select no-box-shadow" id="inputGroupSelect01">
+                                    <option value="jplag">jplag</option>
+                                    <option value="SIM">SIM</option>
+                                    <option value="MOSS">MOSS</option>
+                                    <option value="singleCloud">singleCloud</option>
                                 </select>
                             </div>
                             <div class="input-group col-6 input-group-sm">
                                 <div class="input-group-prepend">
                                     <label class="input-group-text" for="inputGroupSelect02">语言</label>
                                 </div>
-                                <select class="custom-select no-box-shadow" id="inputGroupSelect02">
-                                    <option value="1" selected>One</option>
-                                    <option value="2">Two</option>
-                                    <option value="3">Three</option>
+                                <select v-model="selectedLang[compareTool]" class="custom-select no-box-shadow" id="inputGroupSelect02">
+                                    <option v-for="item in langOptions[compareTool]" :value="item" :key="'lang:' + compareTool + '-' + item">{{item}}</option>
                                 </select>
                             </div>
                         </div>
                         <label for="range"/>
                         <input v-model="simValue" type="range" class="custom-range" min="0" max="100" step="1" id="range">
-                        <div class="submit row px-3">
-                            <button class="only-show btn btn-sm btn-outline-dark col-4 no-box-shadow">相似阈值 <span class="badge badge-light text-danger font-italic font-weight-bold">{{simValue}}</span></button>
-                            <div v-if="type" class="input-group input-group-sm col-4">
-                                <div class="input-group-prepend">
-                                    <button class="btn btn-primary" type="button">代码</button>
-                                </div>
-                                <div class="input-group-append">
-                                    <button class="btn btn-outline-primary" @click="type = false" type="button">文本</button>
-                                </div>
-                            </div>
-                            <div v-else class="input-group input-group-sm col-4">
-                                <div class="input-group-prepend">
-                                    <button class="btn btn-outline-primary" @click="type = true" type="button">代码</button>
-                                </div>
-                                <div class="input-group-append">
-                                    <button class="btn btn-primary" type="button">文本</button>
-                                </div>
-                            </div>
-                            <button v-if="!submitting" @click="submit" type="button" class="btn btn-outline-success btn-sm col-4 no-box-shadow">执行比较</button>
-                            <button v-else type="button" class="btn btn-outline-success btn-sm col-4" disabled>请等待片刻。。。</button>
+                        <div class="submit px-3 d-flex justify-content-between">
+                            <button class="only-show btn btn-sm btn-outline-dark col-6 no-box-shadow">相似阈值 <span class="badge badge-light text-danger font-italic font-weight-bold">{{simValue}}</span></button>
+                            <button v-if="uploadedFilesNameList.length < 2" class="btn btn-outline-warning btn-sm no-box-shadow">请上传至少两个文件</button>
+                            <button v-else-if="!submitting" @click="submit" type="button" class="btn btn-outline-success btn-sm no-box-shadow">执行比较</button>
+                            <button v-else type="button" class="btn btn-outline-success btn-sm no-box-shadow" disabled>请等待片刻。。。</button>
                         </div>
                     </div>
-                    <div class="result px-3 py-1 bg-light">
-
+                    <div class="result px-3 py-1 bg-light pre-scrollable">
+                        <pre>{{result}}</pre>
                     </div>
                     <div class="operation d-flex justify-content-sm-end border-top bg-light">
                         <button type="button" class="btn btn-light btn-sm no-box-shadow py-0">复制到剪贴板</button>
                         <span>|</span>
                         <button type="button" class="btn btn-light btn-sm no-box-shadow py-0">保存到本地</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="MOSSModalCenter" tabindex="-1" role="dialog" aria-labelledby="MOSSModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="MOSSModalCenterTitle">你选择了使用MOSS系统</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        ...
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-dark btn-sm" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-outline-success btn-sm no-box-shadow" @click="submitMOSS">执行比较</button>
                     </div>
                 </div>
             </div>
@@ -99,6 +103,9 @@
     import bottomFooter from "@/components/bottomFooter";
     import uploaderComp from "@/components/uploaderComp";
 
+    import 'bootstrap/dist/js/bootstrap.min';
+    import $ from 'jquery';
+
     export default {
         name: 'app',
         components: {
@@ -108,8 +115,23 @@
             return {
                 submitting: false,
                 simValue: 30,
-                uploadedFilesNameList: null,
-                type: true
+                uploadedFilesNameList: [],
+                result: null,
+                uploading: false,
+                compareTool: 'jplag',
+                MOSSid: null,
+                selectedLang: {
+                    jplag: 'java',
+                    SIM: 'java',
+                    MOSS: 'java',
+                    singleCloud: 'plainText'
+                },
+                langOptions: {
+                    jplag: ['java', 'c/c++', 'plainText'],
+                    SIM: ['java', 'c/c++'],
+                    MOSS: ['java', 'c/c++', 'python'],
+                    singleCloud: ['plainText']
+                }
             }
         },
         mounted() {
@@ -117,19 +139,30 @@
         },
         methods: {
             submit() {
-                let url = '/getFilesName';
-                this.axios.get(this.host + url).then(res => {
-                    // eslint-disable-next-line no-console
-                    console.info(res.data);
-                })
+                if (this.compareTool === 'MOSS') {
+                    $('div#MOSSModalCenter').modal('show');
+                } else {
+                    this.axios.get(this.host + '/performCompare/' + this.compareTool, {
+                        params: {
+                            lang: this.selectedLang[this.compareTool],
+                            simValue: this.simValue
+                        }
+                    }).then(res => {
+                        // eslint-disable-next-line no-console
+                        console.info(res.data);
+                    })
+                }
+            },
+            submitMOSS() {
+                $('div#MOSSModalCenter').modal('hide');
             },
             updateFilesName() {
-                this.axios.get(this.host + '/getFilesName').then(res => {
+                this.axios.get(this.host + '/fileManager/getFilesName').then(res => {
                     this.uploadedFilesNameList = res.data;
                 })
             },
             deleteFile(fileName) {
-                this.axios.get(this.host + '/deleteFile', {
+                this.axios.get(this.host + '/fileManager/deleteFile', {
                     params: {
                         fileName: fileName
                     }
@@ -138,7 +171,7 @@
                 })
             },
             deleteAllFiles() {
-                this.axios.get(this.host + '/deleteAllFiles').then(() => {
+                this.axios.get(this.host + '/fileManager/deleteAllFiles').then(() => {
                     this.updateFilesName();
                 })
             }
