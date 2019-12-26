@@ -51,15 +51,23 @@
                                     <label class="input-group-text" for="inputGroupSelect02">语言</label>
                                 </div>
                                 <select v-model="selectedLang[compareTool]" class="custom-select no-box-shadow" id="inputGroupSelect02">
-                                    <option v-for="item in langOptions[compareTool]" :value="item" :key="'lang:' + compareTool + '-' + item">{{item}}</option>
+                                    <option v-for="item in langOptions[compareTool]" :value="item" :key="'lang:' + compareTool + '-' + item">{{item==='doc'?'富文本':item}}</option>
                                 </select>
                             </div>
                         </div>
-                        <label for="range"/>
-                        <input v-model="simValue" type="range" class="custom-range" min="0" max="100" step="1" id="range">
+                        <template v-if="compareTool !== 'MOSS'">
+                            <label for="range"/>
+                            <input v-model="simValue" type="range" class="custom-range" min="1" max="100" step="1" id="range">
+                        </template>
+                        <template v-else>
+                            <label for="range_disabled"/>
+                            <input v-model="simValue" type="range" class="custom-range" min="1" max="100" step="1" id="range_disabled" disabled>
+                        </template>
                         <div class="submit px-3 d-flex justify-content-between">
-                            <button class="only-show btn btn-sm btn-outline-dark col-6 no-box-shadow">相似阈值 <span class="badge badge-light text-danger font-italic font-weight-bold">{{simValue}}</span></button>
-                            <button v-if="uploadedFilesNameList.length < 2" class="btn btn-outline-warning btn-sm no-box-shadow">请上传至少两个文件</button>
+                            <button v-if="compareTool !== 'MOSS'" class="only-show btn btn-sm btn-outline-dark col-6 no-box-shadow">相似阈值 <span class="badge badge-light text-danger font-italic font-weight-bold">{{simValue}}</span></button>
+                            <button v-else class="only-show btn btn-sm btn-dark col-6 no-box-shadow">相似阈值 <span class="badge badge-light text-danger font-italic font-weight-bold" disabled="">NAN</span></button>
+                            <button v-if="['SIM', 'singleCloud'].indexOf(compareTool) !== -1" class="btn btn-outline-warning btn-sm no-box-shadow">暂不支持{{compareTool}}</button>
+                            <button v-else-if="uploadedFilesNameList.length < 2" class="btn btn-outline-warning btn-sm no-box-shadow">请上传至少两个文件</button>
                             <button v-else-if="!submitting" @click="submit" type="button" class="btn btn-outline-success btn-sm no-box-shadow">执行比较</button>
                             <button v-else type="button" class="btn btn-outline-success btn-sm no-box-shadow" disabled>请等待片刻。。。</button>
                         </div>
@@ -139,13 +147,13 @@
                     jplag: 'java',
                     SIM: 'java',
                     MOSS: 'java',
-                    singleCloud: 'text'
+                    singleCloud: 'doc'
                 },
                 langOptions: {
                     jplag: ['java', 'c/c++', 'python3', 'text', 'doc'],
                     SIM: ['java', 'c'],
-                    MOSS: ['java', 'c', 'csharp', 'python', 'javascript'],
-                    singleCloud: ['text']
+                    MOSS: ["c", "cc", "java", "ml", "pascal", "ada", "lisp", "schema", "haskell", "fortran", "ascii", "vhdl", "perl", "matlab", "python", "mips", "prolog", "spice", "vb", "csharp", "modula2", "a8086", "javascript", "plsql"],
+                    singleCloud: ['doc']
                 }
             }
         },
@@ -154,24 +162,36 @@
         },
         methods: {
             submit() {
-                if (this.compareTool === 'MOSS') {
-                    $('div#MOSSModalCenter').modal('show');
-                } else {
-                    this.submitting = true;
-                    this.result = [];
-                    this.axios.get(this.host + '/performCompare/' + this.compareTool, {
-                        params: {
-                            lang: this.selectedLang[this.compareTool],
-                            simValue: this.simValue
-                        }
-                    }).then(res => {
-                        this.result = res.data;
-                        this.submitting = false;
-                    })
-                }
+                if (this.compareTool === 'MOSS') $('div#MOSSModalCenter').modal('show');
+                else if (this.compareTool === 'jplag') this.submitJplag();
             },
             submitMOSS() {
                 $('div#MOSSModalCenter').modal('hide');
+                this.submitting = true;
+                this.result = [];
+                this.axios.get(this.host + '/performCompare/MOSS', {
+                    params: {
+                        lang: this.selectedLang[this.compareTool],
+                        id: this.MOSSid
+                    }
+                }).then(res => {
+                    // eslint-disable-next-line no-console
+                    console.info(res.data);
+                    this.submitting = false;
+                })
+            },
+            submitJplag() {
+                this.submitting = true;
+                this.result = [];
+                this.axios.get(this.host + '/performCompare/jplag', {
+                    params: {
+                        lang: this.selectedLang[this.compareTool],
+                        simValue: this.simValue
+                    }
+                }).then(res => {
+                    this.result = res.data;
+                    this.submitting = false;
+                })
             },
             updateFilesName() {
                 this.axios.get(this.host + '/fileManager/getFilesName').then(res => {

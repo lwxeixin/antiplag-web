@@ -2,14 +2,19 @@ package cn.mooyyu.antiplagweb.service;
 
 import cn.mooyyu.antiplagweb.util.FileIO;
 import cn.mooyyu.antiplagweb.util.TextExtractor;
+import it.zielke.moji.MossException;
+import it.zielke.moji.SocketClient;
 import jplag.Program;
 import jplag.options.CommandLineOptions;
+import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 
 @Service
 public class PerformCompareService {
@@ -50,7 +55,7 @@ public class PerformCompareService {
         }
     }
 
-    public String[] jplag(String lang, String simValue, String sessionId) {
+    public String[] jplag(String lang, int simValue, String sessionId) {
         cleanResult(new File(result, sessionId));
         if ("doc".equals(lang)) jplagDocConvert(sessionId);
         String[] ret;
@@ -80,5 +85,18 @@ public class PerformCompareService {
         ret[0] = convertMatchesFileToString(new File(file, "matches_avg.csv"));
         ret[1] = convertMatchesFileToString(new File(file, "matches_max.csv"));
         return ret;
+    }
+
+    public String MOSS(String lang, String id, String sessionId) throws MossException, IOException {
+        SocketClient socketClient = new SocketClient();
+        socketClient.setUserID(id);
+        socketClient.setLanguage(lang);
+        socketClient.run();
+        File[] resources = new File(resource, sessionId).listFiles();
+        if (resources != null) for (File file : resources) {
+            socketClient.uploadFile(file);
+        }
+        socketClient.sendQuery();
+        return socketClient.getResultURL().toString();
     }
 }
