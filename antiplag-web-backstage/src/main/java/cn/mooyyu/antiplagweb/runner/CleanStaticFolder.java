@@ -26,7 +26,7 @@ public class CleanStaticFolder implements ApplicationRunner {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private void deleteDir(File root) {
         for (File dir : Objects.requireNonNull(root.listFiles())) {
-            for (File file : Objects.requireNonNull(dir.listFiles())) {
+            if (dir.isDirectory()) for (File file : Objects.requireNonNull(dir.listFiles())) {
                 file.delete();
             }
             dir.delete();

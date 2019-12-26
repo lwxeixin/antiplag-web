@@ -13,7 +13,7 @@ public class ResultService {
         final String fileName = "result.zip";
 
         try {
-            if (!new File(result, sessionId+".zip").exists()) Compress.compress(new File(result, sessionId).getPath(), new File(result, sessionId+".zip").getPath());
+            Compress.compress(new File(result, sessionId).getPath(), new File(result, sessionId+".zip").getPath());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -22,9 +22,10 @@ public class ResultService {
         byte[] buff = new byte[1024];
         BufferedInputStream bis = null;
         OutputStream os = null;
+        File file = new File(result, sessionId+".zip");
         try {
             os = response.getOutputStream();
-            bis = new BufferedInputStream(new FileInputStream(new File(result, sessionId+".zip")));
+            bis = new BufferedInputStream(new FileInputStream(file));
             int i = bis.read(buff);
             while (i != -1) {
                 os.write(buff, 0, buff.length);
@@ -40,6 +41,10 @@ public class ResultService {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            }
+            if (file.exists()) {
+                //noinspection ResultOfMethodCallIgnored
+                file.delete();
             }
         }
     }

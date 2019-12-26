@@ -14,6 +14,9 @@ Vue.prototype.axios = axios;
 import uploader from 'vue-simple-uploader';
 Vue.use(uploader);
 
+import VueClipboard from 'vue-clipboard2';
+Vue.use(VueClipboard);
+
 Vue.config.productionTip = false;
 
 new Vue({

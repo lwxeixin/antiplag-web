@@ -19,10 +19,7 @@
                 options: {
                     target: this.host + '/fileManager/uploadFile',
                     withCredentials: true,
-                    testChunks: false,
-                    categaryMap: { //用于限制上传的类型
-                        image: ["gif", "jpg", "jpeg", "png", "bmp"]
-                    }
+                    testChunks: false
                 },
                 status: true
             }

@@ -64,14 +64,23 @@
                             <button v-else type="button" class="btn btn-outline-success btn-sm no-box-shadow" disabled>请等待片刻。。。</button>
                         </div>
                     </div>
-                    <div class="result px-3 py-1 bg-light pre-scrollable">
-                        <pre>{{result}}</pre>
+                    <div class="result px-3 py-1 bg-light pre-scrollable text-nowrap">
+                        <template v-if="result.length === 1">
+                            <p class="text-danger">请确认上传的文件类型与所选参数是否一致!</p>
+                        </template>
+                        <template v-else-if="result.length === 2">
+                            <p class="text-info">Matches sorted by average similarity <a href="https://jplag.ipd.kit.edu/example/help-sim-en.html" target="_blank">(What is this?)</a>:</p>
+                            <pre>{{result[0]}}</pre>
+                            <hr>
+                            <p class="text-info">Matches sorted by maximum similarity <a href="https://jplag.ipd.kit.edu/example/help-sim-en.html" target="_blank">(What is this?)</a>:</p>
+                            <pre>{{result[1]}}</pre>
+                        </template>
                     </div>
                     <div class="operation d-flex justify-content-sm-end border-top bg-light">
-                        <button v-if="!submitting && uploadedFilesNameList.length > 1" type="button" class="btn btn-light btn-sm no-box-shadow py-0">复制摘要到剪贴板</button>
+                        <button v-if="!submitting && uploadedFilesNameList.length > 1 && result.length === 2" v-clipboard:copy="'Matches sorted by average similarity:\n'+result[0]+'\nMatches sorted by maximum similarity:\n'+result[1]" type="button" class="btn btn-light btn-sm no-box-shadow py-0">复制摘要到剪贴板</button>
                         <button v-else type="button" class="btn btn-light btn-sm no-box-shadow py-0" disabled>复制摘要到剪贴板</button>
                         <span>|</span>
-                        <a v-if="!submitting && uploadedFilesNameList.length > 1" :href="this.host + '/result/jplag'" type="button" class="btn btn-light btn-sm no-box-shadow py-0">保存详细结果到本地</a>
+                        <a v-if="!submitting && uploadedFilesNameList.length > 1 && result.length === 2" :href="this.host + '/result/jplag'" type="button" class="btn btn-light btn-sm no-box-shadow py-0">保存详细结果到本地</a>
                         <button v-else type="button" class="btn btn-light btn-sm no-box-shadow py-0" disabled>保存详细结果到本地</button>
                     </div>
                 </div>
@@ -121,7 +130,7 @@
                 submitting: false,
                 simValue: 30,
                 uploadedFilesNameList: [],
-                result: null,
+                result: [],
                 uploading: false,
                 compareTool: 'jplag',
                 MOSSid: null,
@@ -129,13 +138,13 @@
                     jplag: 'java',
                     SIM: 'java',
                     MOSS: 'java',
-                    singleCloud: 'plainText'
+                    singleCloud: 'text'
                 },
                 langOptions: {
-                    jplag: ['java', 'c/c++', 'plainText'],
-                    SIM: ['java', 'c/c++'],
-                    MOSS: ['java', 'c/c++', 'python'],
-                    singleCloud: ['plainText']
+                    jplag: ['java', 'c/c++', 'python3', 'text', 'doc'],
+                    SIM: ['java', 'c'],
+                    MOSS: ['java', 'c', 'csharp', 'python', 'javascript'],
+                    singleCloud: ['text']
                 }
             }
         },
