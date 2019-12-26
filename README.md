@@ -12,6 +12,8 @@ This system is a web version based on [antiplag](https://github.com/fanghon/anti
 
 - Browser, such as [chrome](https://www.google.com/intl/zh-CN/chrome/)
 
+- platform: mac, linux. (not tested windows platform)
+
 ## how to use
 
 Waiting for replenishment

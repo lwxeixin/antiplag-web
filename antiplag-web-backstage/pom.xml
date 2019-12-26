@@ -44,6 +44,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-app</artifactId>
+            <version>1.23</version>
+        </dependency>
+
+        <dependency>
             <groupId>cn.mooyyu</groupId>
             <artifactId>jplag</artifactId>
             <version>2.12.1</version><!--对应jar相应版本（不知道可随意）-->

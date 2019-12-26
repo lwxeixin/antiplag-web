@@ -67,6 +67,7 @@
                     <div class="result px-3 py-1 bg-light pre-scrollable text-nowrap">
                         <template v-if="result.length === 1">
                             <p class="text-danger">请确认上传的文件类型与所选参数是否一致!</p>
+                            <p class="text-danger">请确认上传的文件类型具有有效内容!</p>
                         </template>
                         <template v-else-if="result.length === 2">
                             <p class="text-info">Matches sorted by average similarity <a href="https://jplag.ipd.kit.edu/example/help-sim-en.html" target="_blank">(What is this?)</a>:</p>
@@ -157,6 +158,7 @@
                     $('div#MOSSModalCenter').modal('show');
                 } else {
                     this.submitting = true;
+                    this.result = [];
                     this.axios.get(this.host + '/performCompare/' + this.compareTool, {
                         params: {
                             lang: this.selectedLang[this.compareTool],
