@@ -16,21 +16,25 @@ public class FileManagerController {
     }
 
     @PostMapping("uploadFile")
+    @ResponseBody
     public void uploadFile(Chunk chunk, HttpServletRequest request) {
         fileManagerService.uploadFile(chunk, request.getSession().getId());
     }
 
     @GetMapping("deleteFile")
+    @ResponseBody
     public boolean deleteFile(@RequestParam String fileName, HttpServletRequest request) {
         return fileManagerService.deleteFile(fileName, request.getSession().getId());
     }
 
     @GetMapping("deleteAllFiles")
+    @ResponseBody
     public boolean deleteAllFiles(HttpServletRequest request) {
         return fileManagerService.deleteAllFiles(request.getSession().getId());
     }
 
     @GetMapping("getFilesName")
+    @ResponseBody
     public String[] getFilesName(HttpServletRequest request) {
         return fileManagerService.getFilesName(request.getSession().getId());
     }

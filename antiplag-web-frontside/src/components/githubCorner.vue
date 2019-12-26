@@ -1,5 +1,5 @@
 <template>
-    <a :href="'https://github.com/' + userName + '/' + repositoryName" class="github-corner" aria-label="View source on GitHub">
+    <a :href="'https://github.com/' + userName + '/' + repositoryName" class="github-corner" target="_blank" aria-label="View source on GitHub">
         <!--suppress HtmlUnknownAttribute -->
         <svg width="80" height="80" viewBox="0 0 250 250"
              style="fill:#64CEAA; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true">

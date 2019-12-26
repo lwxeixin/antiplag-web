@@ -14,8 +14,10 @@
                             <div class="alert alert-light m-0 text-dark border-bottom d-flex justify-content-between rounded-0" role="alert">
                                 <span>管理已上传文件</span>
                                 <span>
-                                    <button @click="updateFilesName" type="button" class="btn btn-outline-primary btn-sm py-0 no-box-shadow">刷新</button>
-                                    <button v-if="uploadedFilesNameList !== null && uploadedFilesNameList.length" @click="deleteAllFiles" type="button" class="btn btn-outline-danger btn-sm py-0 ml-1 no-box-shadow">全部清除</button>
+                                    <button v-if="!submitting" @click="updateFilesName" type="button" class="btn btn-outline-primary btn-sm py-0 no-box-shadow">刷新</button>
+                                    <button v-else type="button" class="btn btn-outline-primary btn-sm py-0 no-box-shadow" disabled>刷新</button>
+                                    <button v-if="!submitting && uploadedFilesNameList !== null && uploadedFilesNameList.length" @click="deleteAllFiles" type="button" class="btn btn-outline-danger btn-sm py-0 ml-1 no-box-shadow">全部清除</button>
+                                    <button v-else type="button" class="btn btn-outline-danger btn-sm py-0 ml-1 no-box-shadow" disabled>全部清除</button>
                                 </span>
                             </div>
                         </li>
@@ -24,7 +26,8 @@
                         <ul class="list-group list-group-flush">
                             <li v-for="(item, index) in uploadedFilesNameList" :key="'item-in-listFolder'+index" class="list-group-item list-group-item-action d-flex justify-content-between">
                                 <span class="w-75 d-inline-block"><span class="font-weight-bold font-italic">{{index}}: </span>{{item}}</span>
-                                <button @click="deleteFile(item)" type="button" class="btn btn-outline-danger btn-sm py-0 no-box-shadow">✕</button>
+                                <button v-if="!submitting" @click="deleteFile(item)" type="button" class="btn btn-outline-danger btn-sm py-0 no-box-shadow">✕</button>
+                                <button v-else type="button" class="btn btn-outline-danger btn-sm py-0 no-box-shadow" disabled>✕</button>
                             </li>
                         </ul>
                     </div>
@@ -65,9 +68,11 @@
                         <pre>{{result}}</pre>
                     </div>
                     <div class="operation d-flex justify-content-sm-end border-top bg-light">
-                        <button type="button" class="btn btn-light btn-sm no-box-shadow py-0">复制到剪贴板</button>
+                        <button v-if="!submitting && uploadedFilesNameList.length > 1" type="button" class="btn btn-light btn-sm no-box-shadow py-0">复制摘要到剪贴板</button>
+                        <button v-else type="button" class="btn btn-light btn-sm no-box-shadow py-0" disabled>复制摘要到剪贴板</button>
                         <span>|</span>
-                        <button type="button" class="btn btn-light btn-sm no-box-shadow py-0">保存到本地</button>
+                        <a v-if="!submitting && uploadedFilesNameList.length > 1" :href="this.host + '/result/jplag'" type="button" class="btn btn-light btn-sm no-box-shadow py-0">保存详细结果到本地</a>
+                        <button v-else type="button" class="btn btn-light btn-sm no-box-shadow py-0" disabled>保存详细结果到本地</button>
                     </div>
                 </div>
             </div>
@@ -142,14 +147,15 @@
                 if (this.compareTool === 'MOSS') {
                     $('div#MOSSModalCenter').modal('show');
                 } else {
+                    this.submitting = true;
                     this.axios.get(this.host + '/performCompare/' + this.compareTool, {
                         params: {
                             lang: this.selectedLang[this.compareTool],
                             simValue: this.simValue
                         }
                     }).then(res => {
-                        // eslint-disable-next-line no-console
-                        console.info(res.data);
+                        this.result = res.data;
+                        this.submitting = false;
                     })
                 }
             },

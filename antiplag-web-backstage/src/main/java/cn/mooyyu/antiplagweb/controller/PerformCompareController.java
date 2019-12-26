@@ -16,6 +16,7 @@ public class PerformCompareController {
     }
 
     @GetMapping("jplag")
+    @ResponseBody
     public String jplag(@RequestParam String lang, @RequestParam String simValue, HttpServletRequest request) {
         return performCompareService.jplag(lang, simValue, request.getSession().getId());
     }
