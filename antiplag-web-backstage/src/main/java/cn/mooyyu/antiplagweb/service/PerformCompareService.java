@@ -41,14 +41,13 @@ public class PerformCompareService {
     private void jplagDocConvert(String sessionId) {
         File convertDir = new File(result, sessionId+"-converted");
         if (convertDir.exists()) cleanResult(convertDir);
-        else {
-            if (convertDir.mkdir()) {
-                File resourceDir = new File(resource, sessionId);
-                String[] files = resourceDir.list();
-                if (files != null) for (String file : files) {
-                    FileIO.saveFile(new File(convertDir, file + ".txt"), TextExtractor.convertToText(new File(resourceDir, file)), "utf-8");
-                }
-            }
+        else { //noinspection ResultOfMethodCallIgnored
+            convertDir.mkdir();
+        }
+        File resourceDir = new File(resource, sessionId);
+        String[] files = resourceDir.list();
+        if (files != null) for (String file : files) {
+            FileIO.saveFile(new File(convertDir, file + ".txt"), TextExtractor.convertToText(new File(resourceDir, file)), "utf-8");
         }
     }
 
