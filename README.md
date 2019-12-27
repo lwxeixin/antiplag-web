@@ -16,7 +16,13 @@ This system is a web version based on [antiplag](https://github.com/fanghon/anti
 
 ## how to use
 
-Waiting for replenishment
+1. download the source zip file and unzip.
+
+2. backstage: configure your database infomation with file **pom.xml** & **application.porperties**.
+
+3. frontend: configure your host in file **main.js**.
+
+4. package backstage by maven, build frontend by vue-cli3. then deploy and enjoy it.
 
 ## theory
 

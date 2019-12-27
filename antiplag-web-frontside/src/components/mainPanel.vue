@@ -72,28 +72,30 @@
                             <button v-else type="button" class="btn btn-outline-success btn-sm no-box-shadow" disabled>请等待片刻。。。</button>
                         </div>
                     </div>
-                    <div v-if="!submitting" class="result px-3 py-1 bg-light pre-scrollable text-nowrap">
-                        <template v-if="resultType === 'jplag'">
-                            <template v-if="result.length === 1">
-                                <p class="text-danger">请确认上传的文件类型与所选参数是否一致!</p>
-                                <p class="text-danger">请确认上传的文件类型具有有效内容!</p>
+                    <div class="result px-3 py-1 bg-light pre-scrollable text-nowrap">
+                        <template v-if="!submitting">
+                            <template v-if="resultType === 'jplag'">
+                                <template v-if="result.length === 1">
+                                    <p class="text-danger">请确认上传的文件类型与所选参数是否一致!</p>
+                                    <p class="text-danger">请确认上传的文件类型具有有效内容!</p>
+                                </template>
+                                <template v-else>
+                                    <p class="text-info">Matches sorted by average similarity <a href="https://jplag.ipd.kit.edu/example/help-sim-en.html" target="_blank">(What is this?)</a>:</p>
+                                    <pre>{{result[0]}}</pre>
+                                    <hr>
+                                    <p class="text-info">Matches sorted by maximum similarity <a href="https://jplag.ipd.kit.edu/example/help-sim-en.html" target="_blank">(What is this?)</a>:</p>
+                                    <pre>{{result[1]}}</pre>
+                                </template>
                             </template>
-                            <template v-else>
-                                <p class="text-info">Matches sorted by average similarity <a href="https://jplag.ipd.kit.edu/example/help-sim-en.html" target="_blank">(What is this?)</a>:</p>
-                                <pre>{{result[0]}}</pre>
-                                <hr>
-                                <p class="text-info">Matches sorted by maximum similarity <a href="https://jplag.ipd.kit.edu/example/help-sim-en.html" target="_blank">(What is this?)</a>:</p>
-                                <pre>{{result[1]}}</pre>
-                            </template>
-                        </template>
-                        <template v-else-if="resultType === 'MOSS'">
-                            <template v-if="result.startsWith('http://moss.stanford.edu/results/')">
-                                查询成功!<br/>
-                                点击 <a :href="result" target="_blank">此链接</a> 查看结果
-                            </template>
-                            <template v-else>
-                                查询失败!<br/>
-                                {{result}}
+                            <template v-else-if="resultType === 'MOSS'">
+                                <template v-if="result.startsWith('http://moss.stanford.edu/results/')">
+                                    查询成功!<br/>
+                                    点击 <a :href="result" target="_blank">此链接</a> 查看结果
+                                </template>
+                                <template v-else>
+                                    查询失败!<br/>
+                                    {{result}}
+                                </template>
                             </template>
                         </template>
                     </div>
