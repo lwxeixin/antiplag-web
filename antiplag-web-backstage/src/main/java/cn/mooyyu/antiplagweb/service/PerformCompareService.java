@@ -6,15 +6,12 @@ import it.zielke.moji.MossException;
 import it.zielke.moji.SocketClient;
 import jplag.Program;
 import jplag.options.CommandLineOptions;
-import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collection;
 
 @Service
 public class PerformCompareService {

@@ -55,7 +55,7 @@
                                 </select>
                             </div>
                         </div>
-                        <template v-if="compareTool !== 'MOSS'">
+                        <template v-if="compareTool === 'jplag'">
                             <label for="range"/>
                             <input v-model="simValue" type="range" class="custom-range" min="1" max="100" step="1" id="range">
                         </template>
@@ -64,7 +64,7 @@
                             <input v-model="simValue" type="range" class="custom-range" min="1" max="100" step="1" id="range_disabled" disabled>
                         </template>
                         <div class="submit px-3 d-flex justify-content-between">
-                            <button v-if="compareTool !== 'MOSS'" class="only-show btn btn-sm btn-outline-dark col-6 no-box-shadow">相似阈值 <span class="badge badge-light text-danger font-italic font-weight-bold">{{simValue}}</span></button>
+                            <button v-if="compareTool === 'jplag'" class="only-show btn btn-sm btn-outline-dark col-6 no-box-shadow">相似阈值 <span class="badge badge-light text-danger font-italic font-weight-bold">{{simValue}}</span></button>
                             <button v-else class="only-show btn btn-sm btn-dark col-6 no-box-shadow">相似阈值 <span class="badge badge-light text-danger font-italic font-weight-bold" disabled="">NAN</span></button>
                             <button v-if="['SIM', 'singleCloud'].indexOf(compareTool) !== -1" class="btn btn-outline-warning btn-sm no-box-shadow">暂不支持{{compareTool}}</button>
                             <button v-else-if="uploadedFilesNameList.length < 2" class="btn btn-outline-warning btn-sm no-box-shadow">请上传至少两个文件</button>
@@ -73,23 +73,35 @@
                         </div>
                     </div>
                     <div class="result px-3 py-1 bg-light pre-scrollable text-nowrap">
-                        <template v-if="result.length === 1">
-                            <p class="text-danger">请确认上传的文件类型与所选参数是否一致!</p>
-                            <p class="text-danger">请确认上传的文件类型具有有效内容!</p>
+                        <template v-if="resultType === 'jplag'">
+                            <template v-if="result.length === 1">
+                                <p class="text-danger">请确认上传的文件类型与所选参数是否一致!</p>
+                                <p class="text-danger">请确认上传的文件类型具有有效内容!</p>
+                            </template>
+                            <template v-else-if="result.length === 2">
+                                <p class="text-info">Matches sorted by average similarity <a href="https://jplag.ipd.kit.edu/example/help-sim-en.html" target="_blank">(What is this?)</a>:</p>
+                                <pre>{{result[0]}}</pre>
+                                <hr>
+                                <p class="text-info">Matches sorted by maximum similarity <a href="https://jplag.ipd.kit.edu/example/help-sim-en.html" target="_blank">(What is this?)</a>:</p>
+                                <pre>{{result[1]}}</pre>
+                            </template>
                         </template>
-                        <template v-else-if="result.length === 2">
-                            <p class="text-info">Matches sorted by average similarity <a href="https://jplag.ipd.kit.edu/example/help-sim-en.html" target="_blank">(What is this?)</a>:</p>
-                            <pre>{{result[0]}}</pre>
-                            <hr>
-                            <p class="text-info">Matches sorted by maximum similarity <a href="https://jplag.ipd.kit.edu/example/help-sim-en.html" target="_blank">(What is this?)</a>:</p>
-                            <pre>{{result[1]}}</pre>
+                        <template v-else-if="resultType === 'MOSS'">
+                            <template v-if="result.startsWith('http://moss.stanford.edu/results/')">
+                                查询成功!<br/>
+                                点击 <a :href="result" target="_blank">此链接</a> 查看结果
+                            </template>
+                            <template v-else>
+                                查询失败!<br/>
+                                {{result}}
+                            </template>
                         </template>
                     </div>
                     <div class="operation d-flex justify-content-sm-end border-top bg-light">
-                        <button v-if="!submitting && uploadedFilesNameList.length > 1 && result.length === 2" v-clipboard:copy="'Matches sorted by average similarity:\n'+result[0]+'\nMatches sorted by maximum similarity:\n'+result[1]" type="button" class="btn btn-light btn-sm no-box-shadow py-0">复制摘要到剪贴板</button>
+                        <button v-if="!submitting && uploadedFilesNameList.length > 1 && resultType==='jplag' && result.length === 2" v-clipboard:copy="'Matches sorted by average similarity:\n'+result[0]+'\nMatches sorted by maximum similarity:\n'+result[1]" type="button" class="btn btn-light btn-sm no-box-shadow py-0">复制摘要到剪贴板</button>
                         <button v-else type="button" class="btn btn-light btn-sm no-box-shadow py-0" disabled>复制摘要到剪贴板</button>
                         <span>|</span>
-                        <a v-if="!submitting && uploadedFilesNameList.length > 1 && result.length === 2" :href="this.host + '/result/jplag'" type="button" class="btn btn-light btn-sm no-box-shadow py-0">保存详细结果到本地</a>
+                        <a v-if="!submitting && uploadedFilesNameList.length > 1 && resultType === 'jplag' && result.length === 2" :href="this.host + '/result/jplag'" type="button" class="btn btn-light btn-sm no-box-shadow py-0">保存详细结果到本地</a>
                         <button v-else type="button" class="btn btn-light btn-sm no-box-shadow py-0" disabled>保存详细结果到本地</button>
                     </div>
                 </div>
@@ -106,11 +118,17 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        ...
+                        <div class="input-group input-group-sm mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-sm">请输入MOSS系统用户id</span>
+                            </div>
+                            <input oninput="value=value.replace(/[^\d]/g,'')" v-model="MOSSid" type="text" class="form-control no-box-shadow" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-dark btn-sm" data-dismiss="modal">取消</button>
-                        <button type="button" class="btn btn-outline-success btn-sm no-box-shadow" @click="submitMOSS">执行比较</button>
+                        <button v-if="MOSSid != null" type="button" class="btn btn-outline-success btn-sm no-box-shadow" @click="submitMOSS">执行比较</button>
+                        <button v-else type="button" class="btn btn-outline-success btn-sm no-box-shadow" @click="submitMOSS" disabled>执行比较</button>
                     </div>
                 </div>
             </div>
@@ -139,7 +157,8 @@
                 submitting: false,
                 simValue: 30,
                 uploadedFilesNameList: [],
-                result: [],
+                result: null,
+                resultType: null,
                 uploading: false,
                 compareTool: 'jplag',
                 MOSSid: null,
@@ -168,16 +187,16 @@
             submitMOSS() {
                 $('div#MOSSModalCenter').modal('hide');
                 this.submitting = true;
-                this.result = [];
+                this.result = null;
                 this.axios.get(this.host + '/performCompare/MOSS', {
                     params: {
                         lang: this.selectedLang[this.compareTool],
                         id: this.MOSSid
                     }
                 }).then(res => {
-                    // eslint-disable-next-line no-console
-                    console.info(res.data);
+                    this.result = res.data;
                     this.submitting = false;
+                    this.resultType = 'MOSS';
                 })
             },
             submitJplag() {
@@ -191,6 +210,7 @@
                 }).then(res => {
                     this.result = res.data;
                     this.submitting = false;
+                    this.resultType = 'jplag';
                 })
             },
             updateFilesName() {
