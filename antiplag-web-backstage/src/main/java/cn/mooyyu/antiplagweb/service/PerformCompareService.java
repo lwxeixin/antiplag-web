@@ -83,16 +83,24 @@ public class PerformCompareService {
         return ret;
     }
 
-    public String MOSS(String lang, String id, String sessionId) throws MossException, IOException {
+    public String MOSS(String lang, String id, String sessionId) {
         SocketClient socketClient = new SocketClient();
         socketClient.setUserID(id);
-        socketClient.setLanguage(lang);
-        socketClient.run();
-        File[] resources = new File(resource, sessionId).listFiles();
-        if (resources != null) for (File file : resources) {
-            socketClient.uploadFile(file);
+        try {
+            socketClient.setLanguage(lang);
+            socketClient.run();
+            File[] resources = new File(resource, sessionId).listFiles();
+            if (resources != null) for (File file : resources) {
+                socketClient.uploadFile(file);
+            }
+            socketClient.sendQuery();
+        } catch (MossException e) {
+            System.out.println(e.toString());
+            return "请确保您从网站获得有效的MOSS帐户，然后输入用户ID。\n这也可能是MOSS服务器的暂时问题或网络故障。";
+        } catch (IOException e) {
+            System.out.println(e.toString());
+            return "网络连接失败，请检查网络。\n这也可能是MOSS服务器的暂时问题。";
         }
-        socketClient.sendQuery();
         return socketClient.getResultURL().toString();
     }
 }

@@ -94,7 +94,7 @@
                                 </template>
                                 <template v-else>
                                     查询失败!<br/>
-                                    {{result}}
+                                    <pre>{{result}}</pre>
                                 </template>
                             </template>
                         </template>

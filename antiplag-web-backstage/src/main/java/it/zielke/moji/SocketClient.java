@@ -8,17 +8,19 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
+
+import lombok.Data;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
+@Data
 public class SocketClient {
     private Socket socket;
     private Stage currentStage;
@@ -51,110 +53,29 @@ public class SocketClient {
         this.language = "java";
     }
 
-    public SocketClient(String server, int port) {
-        this();
-        this.server = server;
-        this.port = port;
+    public int getIncSetID() {
+        return this.setID++;
     }
 
-    public SocketClient(String server, int port, String language) {
-        this(server, port);
-        this.language = language;
-    }
-
-    public void close() {
-        try {
-            this.sendCommand("end\n");
-            this.out.close();
-            this.in.close();
-            this.socket.close();
-        } catch (MossException | IOException ignored) {
-        } finally {
-            this.currentStage = Stage.DISCONNECTED;
-        }
-
-    }
-
-    public void connect() throws UnknownHostException, IOException, SecurityException {
+    public void connect() throws IOException, SecurityException {
         if (this.currentStage != Stage.DISCONNECTED) {
             throw new RuntimeException("Client is already connected");
         } else {
             this.socket = new Socket(this.server, this.port);
             this.socket.setKeepAlive(true);
+            this.socket.setSoTimeout(3000);
             this.out = this.socket.getOutputStream();
+            //noinspection deprecation
             this.in = new BufferedReader(new InputStreamReader(this.socket.getInputStream(), Charsets.US_ASCII));
             this.currentStage = Stage.AWAITING_INITIALIZATION;
         }
-    }
-
-    public Stage getCurrentStage() {
-        return this.currentStage;
-    }
-
-    /** @deprecated */
-    @java.lang.SuppressWarnings("DeprecatedIsStillUsed")
-    @Deprecated
-    public int getIncSetID() {
-        return this.setID++;
-    }
-
-    public String getLanguage() {
-        return this.language;
-    }
-
-    public String getOptC() {
-        return this.optC;
-    }
-
-    public int getOptD() {
-        return this.optD;
-    }
-
-    public long getOptM() {
-        return this.optM;
-    }
-
-    public long getOptN() {
-        return this.optN;
-    }
-
-    public int getOptX() {
-        return this.optX;
-    }
-
-    public int getPort() {
-        return this.port;
-    }
-
-    public URL getResultURL() {
-        return this.resultURL;
-    }
-
-    public String getServer() {
-        return this.server;
-    }
-
-    public int getSetID() {
-        return this.setID;
-    }
-
-    public Socket getSocket() {
-        return this.socket;
-    }
-
-    public List<String> getSupportedLanguages() {
-        return this.supportedLanguages;
-    }
-
-    public String getUserID() {
-        return this.userID;
     }
 
     public String readFromServer() throws IOException {
         return this.in.readLine();
     }
 
-    public void run() throws MossException, IOException, UnknownHostException {
+    public void run() throws MossException, IOException {
         this.connect();
         this.sendInitialization();
         this.sendLanguage();
@@ -169,7 +90,7 @@ public class SocketClient {
             commandStrings.add(s);
         }
 
-        this.sendCommandStrings((String[]) commandStrings.toArray(commandArray));
+        this.sendCommandStrings(commandStrings.toArray(commandArray));
     }
 
     private void sendCommandStrings(String... strings) throws MossException {
@@ -187,6 +108,7 @@ public class SocketClient {
             sb.append('\n');
 
             try {
+                //noinspection deprecation
                 byte[] bytes = sb.toString().getBytes(Charsets.US_ASCII);
                 this.out.write(bytes);
                 this.out.flush();
@@ -226,11 +148,6 @@ public class SocketClient {
         }
     }
 
-    public void sendLanguage(String language) throws MossException, IOException {
-        this.setLanguage(language);
-        this.sendLanguage();
-    }
-
     public void sendQuery() throws MossException, IOException {
         if (this.currentStage != Stage.AWAITING_QUERY) {
             throw new RuntimeException("Cannot send query at this time. Connection is either not initialized or already closed");
@@ -262,42 +179,11 @@ public class SocketClient {
         }
     }
 
-    public void setOptC(String optC) {
-        this.optC = optC;
-    }
-
-    public void setOptM(long optM) {
-        this.optM = optM;
-    }
-
-    public void setOptN(long optN) {
-        this.optN = optN;
-    }
-
-    public void setOptX(int optX) {
-        this.optX = optX;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public void setServer(String server) {
-        this.server = server;
-    }
-
-    public void setSocket(Socket socket) {
-        this.socket = socket;
-    }
-
-    public void setUserID(String userID) {
-        this.userID = userID;
-    }
-
     public void uploadFile(File file) throws IOException {
         this.uploadFile(file, false);
     }
 
+    @SuppressWarnings("unused")
     public void uploadBaseFile(File file) throws IOException {
         this.uploadFile(file, true);
     }
