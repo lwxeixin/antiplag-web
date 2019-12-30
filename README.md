@@ -14,6 +14,10 @@ This system is a web version based on [antiplag](https://github.com/fanghon/anti
 
 - platform: mac, linux. (not tested windows platform)
 
+## ScreenShot
+
+![ScreenShot](./images/ScreenShot.jpg)
+
 ## how to use
 
 1. download the source zip file and unzip.
